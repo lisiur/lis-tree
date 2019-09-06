@@ -1,0 +1,1 @@
+<view class="content"><lis-tree class="tree" vue-id="1" root="{{root}}" checked="{{checked}}" expand="{{expand}}" show-checkbox data-com-type="wx" bind:__l="__l"></lis-tree></view>

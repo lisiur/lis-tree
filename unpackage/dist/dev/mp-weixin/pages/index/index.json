@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "uni-app",
+  "usingComponents": {
+    "comp-tree": "/components/lis-tree/lis-tree"
+  }
+}
