@@ -1,6 +1,6 @@
 <template>
 	<view class="content">
-		<lis-tree class="tree" :root="root" :checked="checked" :expand="expand" show-checkbox></lis-tree>
+		<lis-tree class="tree" :root="root" :checked="checked" :expand="expand" show-checkbox :change-handler="onChange"></lis-tree>
 	</view>
 </template>
 
@@ -70,6 +70,11 @@
 				],
 			}
 		},
+		methods: {
+			onChange(selected) {
+				console.log(selected)
+			}
+		}
 		
 	}
 </script>

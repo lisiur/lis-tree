@@ -64,7 +64,11 @@
 			},
 			getRoot: {
 				type: Function,
-			}
+			},
+			changeHandler: {
+				type: Function,
+				default: () => {},
+			},
 
 		},
 		data() {
@@ -81,6 +85,7 @@
 					handler.call(this, item)
 					this.$nextTick(() => {
 						this.setCurrentLevelData()
+						this.changeHandler(this.getChecked())
 					})
 				}
 			})
@@ -99,6 +104,7 @@
 					const target = this.getItemById(id)
 
 					handler.call(this, target)
+					this.changeHandler(this.getChecked())
 				} else {
 					this.$emit('on-change', item, handler)
 				}
