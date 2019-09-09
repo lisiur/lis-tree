@@ -204,6 +204,7 @@
 				const self = this
 				this.$emit('on-change', item, function(item) {
 					item._checked = !item._checked
+					item._indeterminate = false
 					this.upStreamCheck(item)
 					this.downStreamCheck(item)
 					this.$nextTick(() => {
