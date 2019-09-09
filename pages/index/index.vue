@@ -1,6 +1,6 @@
 <template>
 	<view class="content">
-		<lis-tree class="tree" :root="root" :checked="checked" :expand="expand" show-checkbox :change-handler="onChange" auto-expand></lis-tree>
+		<lis-tree class="tree" :root="root" :checked="checked" show-checkbox :change-handler="onChange" auto-expand></lis-tree>
 	</view>
 </template>
 
@@ -14,7 +14,6 @@
 			return {
 				root: {},
 				checked: [],
-				expand: [],
 			}
 		},
 		methods: {
@@ -71,14 +70,6 @@
 					{
 						id: 'yuhang',
 					}
-				]
-				this.expand = [
-					{
-						id: 'jiangsu'
-					},
-					{
-						id: 'nanjing',
-					},
 				]
 			}, 1000)
 		},
