@@ -104,7 +104,7 @@
 				this.init({checked: true})
 			},
 			checked() {
-				this.init({checked: true})
+				this.init({checked: true, expand: true})
 			},
 			expand() {
 				this.init({checked: true, expand: true})
