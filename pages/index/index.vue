@@ -1,6 +1,6 @@
 <template>
 	<view class="content">
-		<lis-tree class="tree" :root="root" :checked="checked" :expand="expand" show-checkbox :change-handler="onChange"></lis-tree>
+		<lis-tree class="tree" :root="root" :checked="checked" :expand="expand" show-checkbox :change-handler="onChange" auto-expand></lis-tree>
 	</view>
 </template>
 
@@ -12,7 +12,19 @@
 		},
 		data() {
 			return {
-				root: {
+				root: {},
+				checked: [],
+				expand: [],
+			}
+		},
+		methods: {
+			onChange(selected) {
+				console.log(selected)
+			}
+		},
+		onLoad() {
+			setTimeout(() => {
+				this.root = {
 					children: [
 						{
 							id: 'jiangsu',
@@ -51,26 +63,7 @@
 							]
 						},
 					]
-				},
-				checked: [{
-						id: 'pukou',
-					}],
-				expand: [{
-						id: 'jiangsu',
-					},
-					{
-						id: 'nanjing',
-					},
-				],
-			}
-		},
-		methods: {
-			onChange(selected) {
-				console.log(selected)
-			}
-		},
-		onLoad() {
-			setTimeout(() => {
+				}
 				this.checked = [
 					{
 						id: 'jiangning',
@@ -79,7 +72,15 @@
 						id: 'yuhang',
 					}
 				]
-			}, 2000)
+				this.expand = [
+					{
+						id: 'jiangsu'
+					},
+					{
+						id: 'nanjing',
+					},
+				]
+			}, 1000)
 		},
 		
 	}
