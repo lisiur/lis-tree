@@ -27,27 +27,27 @@ showCheckbox: { // 是否显示复选框，默认不显示
 },
 hasChildren: {  // 判断是否有子节点，默认判断节点数据的[children]属性是否是True值。注意如果children为[]也会判断为有子节点。可通过传递自定义判断函数满足不同需求
 	type: Function,
-	default: () => data => data.children
+	default: data => data.children
 },
 getChildren: { // 获取子节点，默认返回节点数据的[children]值
 	type: Function,
-	default: () => data => data.children
+	default: data => data.children
 },
 getId: {      // 获取节点唯一标识符，默认为id
 	type: Function,
-	default: () => data => data.id
+	default: data => data.id
 },
 getName: {   // 获取节点展示名称，默认为name
 	type: Function,
-	default: () => data => data.name
+	default: data => data.name
 },
 checked: {   // 初始化选中节点
 	type: Array,
-	default: () => [],
+	default: [],
 },
 expand: {    // 初始化展开节点
 	type: Array,
-	default: () => [],
+	default: [],
 },
 changeHandler: {  // 选中状态发生变化时执行的函数
 	type: Function,
@@ -65,15 +65,15 @@ getChecked()  // 获取选中的节点
 ```
 <template>
 	<view class="content">
-		<lis-tree show-checkbox :root="root" :checked="checked" :expand="expand" :change-handler="onChange"></lis-tree>
+		<lis-tree show-checkbox :root="root" :checked="checked" :expand="expand" :change-handler="changeHandler"></lis-tree>
 	</view>
 </template>
 
 <script>
-	import CompTree from '@/components/lis-tree/lis-tree.vue'
+	import LisTree from '@/components/lis-tree/lis-tree.vue'
 	export default {
 		components: {
-			CompTree
+			LisTree
 		},
 		data() {
 			return {
@@ -136,7 +136,7 @@ getChecked()  // 获取选中的节点
 			}
 		},
 		methods: {
-			onChange(selected) {
+			changeHandler(selected) {
 				console.log(selected)
 			}
 		}
