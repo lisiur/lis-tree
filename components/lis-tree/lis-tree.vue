@@ -60,6 +60,10 @@
 				type: Array,
 				default: () => [],
 			},
+			autoExpand: {
+				type: Boolean,
+				default: false
+			},
 			level: {
 				type: Number,
 				default: 0,
@@ -76,9 +80,11 @@
 		data() {
 			return {
 				currentLevelData: [],
+				innerExpand: [],
 			}
 		},
 		mounted() {
+			this.init({expand: true, checked: true})
 			this.$on('on-change', (item, handler) => {
 				if (this.level === 0) {
 					handler.call(this, item)
@@ -87,27 +93,27 @@
 						this.changeHandler(this.getChecked())
 					})
 				}
+				// this.$forceUpdate.call(this)
 			})
-			this.init()
 		},
 		onUnload() {
 			this.$off('on-change')
 		},
 		watch: {
 			root() {
-				this.init()
+				this.init({checked: true})
 			},
 			checked() {
-				this.init()
+				this.init({checked: true})
 			},
 			expand() {
-				this.init()
+				this.init({checked: true, expand: true})
 			}
 		},
 		methods: {
-			init() {
+			init({expand, checked}) {
 				if (this.level === 0) {
-					this.syncState()
+					this.syncState({checked, expand})
 				}
 				this.setCurrentLevelData()
 			},
@@ -128,14 +134,22 @@
 					this.$emit('on-change', item, handler)
 				}
 			},
-			syncState() {
+			syncState({expand, checked}) {
+				if (checked) {
+					this.syncStateChecked()
+				}
+				if (expand) {
+					this.syncStateExpand()
+				}
+			},
+			syncStateChecked() {
 				const parent = this.root
 				this.forEachTree(parent, (item, parent) => {
-					item._checked = this.isChecked(item)
-					item._expand = this.isExpand(item)
-					item._indeterminate = false
-					item._parent = this.getId(parent)
-					item._hasChildren = this.hasChildren(item)
+					this.$set(item, '_checked', this.isChecked(item))
+					this.$set(item, '_expand', false)
+					this.$set(item, '_indeterminate', false)
+					this.$set(item, '_parent', this.getId(parent))
+					this.$set(item, '_hasChildren', this.hasChildren(item))
 				})
 				this.forEachTree(parent, (item, parent) => {
 					if (item._checked) {
@@ -145,6 +159,26 @@
 					}
 				})
 				return parent
+			},
+			syncStateExpand() {
+				this.setInnerExpand()
+				this.forEachTree(this.root, (item, parent) => {
+					this.$set(item, '_expand', this.isExpand(item))
+				})
+			},
+			setInnerExpand() {
+				if (this.autoExpand) {
+					this.forEachTree(this.root, (item, parent) => {
+						if (!this.hasChildren(item)) {
+							return true
+						}
+						if (item._indeterminate) {
+							this.innerExpand.push(item)
+						}
+					})
+				} else {
+					this.innerExpand = this.expand
+				}
 			},
 			forEachTree(tree, handler) {
 				if (!tree) {
@@ -169,16 +203,16 @@
 					const children = this.getChildren(parent)
 					const checked = children.filter(it => it._checked)
 					const indeterminated = children.filter(it => it._indeterminate)
-					parent._checked = checked.length === children.length
-					parent._indeterminate = !parent._checked && (indeterminated.length > 0 || checked.length > 0)
+					this.$set(parent, '_checked', checked.length === children.length)
+					this.$set(parent, '_indeterminate', !parent._checked && (indeterminated.length > 0 || checked.length > 0))
 					this.upStreamCheck(parent)
 				}
 			},
 			downStreamCheck(node) {
 				if (this.hasChildren(node)) {
 					for (let item of this.getChildren(node)) {
-						item._checked = node._checked
-						item._indeterminate = false
+						this.$set(item, '_checked', node._checked)
+						this.$set(item, '_indeterminate', false)
 						this.downStreamCheck(item)
 					}
 				}
@@ -187,7 +221,7 @@
 				return !!this.checked.find(it => this.isSame(item, it))
 			},
 			isExpand(item) {
-				return !!this.expand.find(it => this.isSame(item, it))
+				return !!this.innerExpand.find(it => this.isSame(item, it))
 			},
 			isChildrenAllCheck(item) {
 				if (this.hasChildren(item)) {
@@ -212,23 +246,21 @@
 			handleToggleExpand(item) {
 				const self = this
 				this.$emit('on-change', item, (item) => {
-					item._expand = !item._expand
+					this.$set(item, '_expand', !item._expand)
 					this.$nextTick(() => {
 						this.setCurrentLevelData.call(self)
-						// this.$forceUpdate.call(self)
 					})
 				})
 			},
 			handleToggleCheck(item) {
 				const self = this
 				this.$emit('on-change', item, function(item) {
-					item._checked = !item._checked
-					item._indeterminate = false
+					this.$set(item, '_checked', !item._checked)
+					this.$set(item, '_indeterminate', false)
 					this.upStreamCheck(item)
 					this.downStreamCheck(item)
 					this.$nextTick(() => {
 						this.setCurrentLevelData.call(self)
-						// this.$forceUpdate.call(self)
 					})
 				})
 			},
