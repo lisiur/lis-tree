@@ -52,16 +52,10 @@
 						},
 					]
 				},
-				checked: [
-					{
-						id: 'jiangning',
-					},
-					{
-						id: 'yuhang',
-					}
-				],
-				expand: [
-					{
+				checked: [{
+						id: 'pukou',
+					}],
+				expand: [{
 						id: 'jiangsu',
 					},
 					{
@@ -74,7 +68,19 @@
 			onChange(selected) {
 				console.log(selected)
 			}
-		}
+		},
+		onLoad() {
+			setTimeout(() => {
+				this.checked = [
+					{
+						id: 'jiangning',
+					},
+					{
+						id: 'yuhang',
+					}
+				]
+			}, 2000)
+		},
 		
 	}
 </script>
