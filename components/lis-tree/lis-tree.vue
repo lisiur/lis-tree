@@ -79,9 +79,6 @@
 			}
 		},
 		mounted() {
-			if (this.level === 0) {
-				this.syncState()
-			}
 			this.$on('on-change', (item, handler) => {
 				if (this.level === 0) {
 					handler.call(this, item)
@@ -91,9 +88,29 @@
 					})
 				}
 			})
-			this.setCurrentLevelData()
+			this.init()
+		},
+		onUnload() {
+			this.$off('on-change')
+		},
+		watch: {
+			root() {
+				this.init()
+			},
+			checked() {
+				this.init()
+			},
+			expand() {
+				this.init()
+			}
 		},
 		methods: {
+			init() {
+				if (this.level === 0) {
+					this.syncState()
+				}
+				this.setCurrentLevelData()
+			},
 			setCurrentLevelData() {
 				this.currentLevelData = this.getChildren(this.parent || this.root)
 			},
