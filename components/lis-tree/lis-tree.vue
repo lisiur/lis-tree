@@ -159,6 +159,7 @@
 				if (this.hasChildren(node)) {
 					for (let item of this.getChildren(node)) {
 						item._checked = node._checked
+						item._indeterminate = false
 						this.downStreamCheck(item)
 					}
 				}
