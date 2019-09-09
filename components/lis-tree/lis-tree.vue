@@ -8,8 +8,10 @@
 						<image class="uni-tree-item-checkbox-icon" :src="`/static/lis-tree/indeterminate.png`" v-else-if="item._indeterminate"></image>
 						<image class="uni-tree-item-checkbox-icon" :src="`/static/lis-tree/unchecked.png`" v-else></image>
 					</div>
-					<span class="uni-tree-item-name" @click="handleToggleExpand(currentLevelData[index])">{{item.name}}</span>
-					<image class="uni-tree-item-expand-icon" :src="`/static/lis-tree/expand_${item._expand ? 1 : 0}.png`" v-if="item._hasChildren"></image>
+					<div class="uni-tree-item-name-wrapper" @click="handleToggleExpand(currentLevelData[index])">
+						<span class="uni-tree-item-name">{{item.name}}</span>
+						<image class="uni-tree-item-expand-icon" :src="`/static/lis-tree/expand_${item._expand ? 1 : 0}.png`" v-if="item._hasChildren"></image>
+					</div>
 				</div>
 				<div class="uni-tree-item-children" v-if="hasChildren(item)">
 					<lis-tree :root="root" :parent="item" :level="level+1" :has-children="hasChildren" :get-children="getChildren"
@@ -240,6 +242,12 @@
 	}
 
 	.uni-tree-item-checkbox-wrapper {
+		display: flex;
+		align-items: center;
+	}
+	
+	.uni-tree-item-name-wrapper {
+		flex: 1;
 		display: flex;
 		align-items: center;
 	}
