@@ -49,6 +49,10 @@ expand: {    // 初始化展开节点
 	type: Array,
 	default: [],
 },
+autoExpand: { // 展开tree使得传入的 checked 可见，此配置会让 expand 失效
+	type: Boolean,
+	default: false
+},
 changeHandler: {  // 选中状态发生变化时执行的函数
 	type: Function,
 	default: (checked) => {},
