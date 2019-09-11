@@ -2,7 +2,8 @@
 
 适用于 uniapp 的 tree 组件
 
-**注意：** 该组件使用递归定义方式，因此一定要在pages.json里声明该组件
+## 注意
+1. 该组件使用递归定义方式，因此一定要在pages.json里声明该组件
 
 ```
 {
@@ -14,6 +15,14 @@
 	}
 }
 ```
+
+2. App Plus 和 小程序可以直接使用, H5 需要在 main.js 里全局注册组件. 详情可见示例项目
+```
+import LisTree from './components/lis-tree/lis-tree.vue'
+Vue.component('lis-tree', LisTree)
+```
+
+3. 组件采用条件编译,可根据自己使用的平台,自行删掉不必要的代码.
 
 ## props
 
@@ -159,3 +168,4 @@ getChecked()  // 返回选中的节点数组, 单选时返回只包含一个选�
 	}
 </script>
 ```
+

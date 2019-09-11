@@ -51,6 +51,7 @@
 				type: Boolean,
 				default: false,
 			},
+			// #ifndef H5
 			hasChildren: {
 				type: Function,
 				default: () => data => data.children
@@ -67,6 +68,25 @@
 				type: Function,
 				default: () => data => data.name
 			},
+			// #endif
+			// #ifdef H5
+			hasChildren: {
+				type: Function,
+				default: data => data.children
+			},
+			getChildren: {
+				type: Function,
+				default: data => data.children
+			},
+			getId: {
+				type: Function,
+				default: data => data.id
+			},
+			getName: {
+				type: Function,
+				default: data => data.name
+			},
+			// #endif
 			selected: {
 				type: Object,
 			},
@@ -102,7 +122,7 @@
 		},
 		mounted() {
 			this.init({expand: true, checked: true})
-			this.$on('on-change', (item, handler) => {
+			this.$on('on-change', ({item, handler}) => {
 				if (this.level === 0) {
 					handler.call(this, item)
 					this.$nextTick(() => {
@@ -140,10 +160,15 @@
 			setCurrentLevelData() {
 				this.currentLevelData = this.getChildren(this.parent || this.root)
 			},
-			onChange({
-				detail
-			}) {
-				const [item, handler] = detail.__args__
+			onChange(args) {
+				// #ifdef H5
+				const {item, handler} = args
+				// #endif
+				
+				// #ifndef H5
+				const {item, handler} = args.detail.__args__[0]
+				// #endif
+				
 				if (this.level === 0) {
 					const id = this.getId(item)
 					const target = this.getItemById(id)
@@ -151,7 +176,7 @@
 					handler.call(this, target)
 					this.changeHandler(this.getChecked())
 				} else {
-					this.$emit('on-change', item, handler)
+					this.$emit('on-change', {item, handler})
 				}
 			},
 			syncState({expand, checked, selected}) {
@@ -320,16 +345,16 @@
 			},
 			handleToggleExpand(item) {
 				const self = this
-				this.$emit('on-change', item, (item) => {
+				this.$emit('on-change', {item, handler: function (item) {
 					this.$set(item, '_expand', !item._expand)
 					this.$nextTick(() => {
 						this.setCurrentLevelData.call(self)
 					})
-				})
+				}})
 			},
 			handleToggleCheck(item) {
 				const self = this
-				this.$emit('on-change', item, function(item) {
+				this.$emit('on-change', {item, handler: function (item) {
 					this.$set(item, '_checked', !item._checked)
 					this.$set(item, '_indeterminate', false)
 					this.upStreamCheck(item)
@@ -337,18 +362,18 @@
 					this.$nextTick(() => {
 						this.setCurrentLevelData.call(self)
 					})
-				})
+				}})
 			},
 			handleToggleSelect(item) {
 				const self = this
-				this.$emit('on-change', item, function(item) {
+				this.$emit('on-change', {item, handler: function (item) {
 					this.clearSelect()
 					this.$set(item, '_selected', true)
 					this.upStreamSelect(item)
 					this.$nextTick(() => {
 						this.setCurrentLevelData.call(self)
 					})
-				})
+				}})
 			},
 			getChecked() {
 				const checked = []
