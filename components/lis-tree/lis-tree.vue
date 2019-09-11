@@ -438,21 +438,28 @@
 			},
 			getChecked() {
 				const checked = []
-				this.forEachTree(this.root, item => {
-					if (this.showCheckbox) {
-						if (item._checked) {
-							checked.push(item)
-							return true
+				if (this.showCheckbox) {
+					this.forEachTree(this.root, item => {
+						if (this.leafOnly) {
+							if (item._checked && !item._hasChildren) {
+								checked.push(item)
+							}
+						} else {
+							if (item._checked) {
+								checked.push(item)
+								return true
+							}
 						}
-					}
-					if (this.showRadio) {
+					})
+				}
+				if (this.showRadio) {
+					this.forEachTree(this.root, item => {
 						if (item._selected) {
 							checked.push(item)
 							return true
 						}
-					}
-
-				})
+					})
+				}
 				return checked
 			}
 		}
