@@ -8,10 +8,7 @@
 						<image class="uni-tree-item-checkbox-icon" :src="`/static/lis-tree/indeterminate.png`" v-else-if="item._indeterminate"></image>
 						<image class="uni-tree-item-checkbox-icon" :src="`/static/lis-tree/unchecked.png`" v-else></image>
 					</div>
-					<div 
-						v-if="canShowRadio(item)"
-						class="uni-tree-item-radio-wrapper"
-						@click="handleToggleSelect(currentLevelData[index])">
+					<div v-if="canShowRadio(item)" class="uni-tree-item-radio-wrapper" @click="handleToggleSelect(currentLevelData[index])">
 						<image class="uni-tree-item-radio-icon" :src="`/static/lis-tree/selected.png`" v-if="item._selected"></image>
 						<image class="uni-tree-item-radio-icon" :src="`/static/lis-tree/unselected.png`" v-else></image>
 					</div>
@@ -22,7 +19,8 @@
 				</div>
 				<div class="uni-tree-item-children" v-if="hasChildren(item)">
 					<lis-tree :root="root" :parent="item" :level="level+1" :has-children="hasChildren" :get-children="getChildren"
-					 :get-id="getId" :get-name="getName" :show-radio="showRadio" :leaf-only="leafOnly" :show-checkbox="showCheckbox" @on-change="onChange" v-if="item._expand"></lis-tree>
+					 :get-id="getId" :get-name="getName" :show-radio="showRadio" :leaf-only="leafOnly" :show-checkbox="showCheckbox"
+					 @on-change="onChange" v-if="item._expand"></lis-tree>
 				</div>
 			</div>
 		</template>
@@ -121,39 +119,74 @@
 			}
 		},
 		mounted() {
-			this.init({expand: true, checked: true})
-			this.$on('on-change', ({item, handler}) => {
-				if (this.level === 0) {
+			if (this.level === 0) {
+				this.$on('on-change', ({
+					item,
+					handler
+				}) => {
 					handler.call(this, item)
 					this.$nextTick(() => {
 						this.setCurrentLevelData()
 						this.changeHandler(this.getChecked())
 					})
-				}
-				// this.$forceUpdate.call(this)
-			})
+				})
+			}
 		},
 		onUnload() {
-			this.$off('on-change')
+			if (this.level === 0) {
+				this.$off('on-change')
+			}
 		},
 		watch: {
-			root() {
-				this.init({checked: true})
+			root: {
+				handler() {
+					this.init({
+						checked: true,
+						selected: true,
+						expand: true
+					})
+				},
+				immediate: true
 			},
-			checked() {
-				this.init({checked: true, expand: true})
+			checked: {
+				handler() {
+					this.init({
+						checked: true,
+						expand: true
+					})
+				},
+				immediate: true
 			},
-			expand() {
-				this.init({expand: true})
+			expand: {
+				handler() {
+					this.init({
+						expand: true
+					})
+				},
+				immediate: true
 			},
-			selected() {
-				this.init({selected: true, expand: true})
+			selected: {
+				handler() {
+					this.init({
+						selected: true,
+						expand: true
+					})
+				},
+				immediate: true
 			},
 		},
 		methods: {
-			init({expand, checked, selected}) {
+			init({
+				expand,
+				checked,
+				selected
+			}) {
 				if (this.level === 0) {
-					this.syncState({checked, expand, selected})
+					this.syncState({
+						checked,
+						expand,
+						selected
+					})
 				}
 				this.setCurrentLevelData()
 			},
@@ -162,13 +195,19 @@
 			},
 			onChange(args) {
 				// #ifdef H5
-				const {item, handler} = args
+				const {
+					item,
+					handler
+				} = args
 				// #endif
-				
+
 				// #ifndef H5
-				const {item, handler} = args.detail.__args__[0]
+				const {
+					item,
+					handler
+				} = args.detail.__args__[0]
 				// #endif
-				
+
 				if (this.level === 0) {
 					const id = this.getId(item)
 					const target = this.getItemById(id)
@@ -176,10 +215,17 @@
 					handler.call(this, target)
 					this.changeHandler(this.getChecked())
 				} else {
-					this.$emit('on-change', {item, handler})
+					this.$emit('on-change', {
+						item,
+						handler
+					})
 				}
 			},
-			syncState({expand, checked, selected}) {
+			syncState({
+				expand,
+				checked,
+				selected
+			}) {
 				if (checked) {
 					this.syncStateChecked()
 				}
@@ -191,6 +237,9 @@
 				}
 			},
 			syncStateChecked() {
+				if (!this.checked) {
+					return
+				}
 				const parent = this.root
 				this.forEachTree(parent, (item, parent) => {
 					this.$set(item, '_checked', this.isChecked(item))
@@ -209,6 +258,9 @@
 				return parent
 			},
 			syncStateSelected() {
+				if (!this.selected) {
+					return
+				}
 				const parent = this.root
 				this.forEachTree(parent, (item, parent) => {
 					this.$set(item, '_selected', this.isSelected(item))
@@ -345,35 +397,44 @@
 			},
 			handleToggleExpand(item) {
 				const self = this
-				this.$emit('on-change', {item, handler: function (item) {
-					this.$set(item, '_expand', !item._expand)
-					this.$nextTick(() => {
-						this.setCurrentLevelData.call(self)
-					})
-				}})
+				this.$emit('on-change', {
+					item,
+					handler: function(item) {
+						this.$set(item, '_expand', !item._expand)
+						this.$nextTick(() => {
+							this.setCurrentLevelData.call(self)
+						})
+					}
+				})
 			},
 			handleToggleCheck(item) {
 				const self = this
-				this.$emit('on-change', {item, handler: function (item) {
-					this.$set(item, '_checked', !item._checked)
-					this.$set(item, '_indeterminate', false)
-					this.upStreamCheck(item)
-					this.downStreamCheck(item)
-					this.$nextTick(() => {
-						this.setCurrentLevelData.call(self)
-					})
-				}})
+				this.$emit('on-change', {
+					item,
+					handler: function(item) {
+						this.$set(item, '_checked', !item._checked)
+						this.$set(item, '_indeterminate', false)
+						this.upStreamCheck(item)
+						this.downStreamCheck(item)
+						this.$nextTick(() => {
+							this.setCurrentLevelData.call(self)
+						})
+					}
+				})
 			},
 			handleToggleSelect(item) {
 				const self = this
-				this.$emit('on-change', {item, handler: function (item) {
-					this.clearSelect()
-					this.$set(item, '_selected', true)
-					this.upStreamSelect(item)
-					this.$nextTick(() => {
-						this.setCurrentLevelData.call(self)
-					})
-				}})
+				this.$emit('on-change', {
+					item,
+					handler: function(item) {
+						this.clearSelect()
+						this.$set(item, '_selected', true)
+						this.upStreamSelect(item)
+						this.$nextTick(() => {
+							this.setCurrentLevelData.call(self)
+						})
+					}
+				})
 			},
 			getChecked() {
 				const checked = []
@@ -390,7 +451,7 @@
 							return true
 						}
 					}
-					
+
 				})
 				return checked
 			}
@@ -400,7 +461,7 @@
 
 <style>
 	.uni-tree {}
-	
+
 	.uni-tree-item {
 		margin: 18upx 0;
 	}
@@ -409,7 +470,7 @@
 		width: 52upx;
 		height: 52upx;
 	}
-	
+
 	.uni-tree-item-radio-icon {
 		width: 52upx;
 		height: 52upx;
@@ -419,12 +480,12 @@
 		display: flex;
 		align-items: center;
 	}
-	
+
 	.uni-tree-item-radio-wrapper {
 		display: flex;
 		align-items: center;
 	}
-	
+
 	.uni-tree-item-name-wrapper {
 		flex: 1;
 		display: flex;

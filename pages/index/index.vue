@@ -76,7 +76,7 @@
 					]
 				}
 				this.selected = {
-					id: 'jiangning',
+					id: 'pukou',
 				}
 				this.checked = [{
 					id: 'jiangning'
