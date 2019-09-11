@@ -25,6 +25,33 @@ showCheckbox: { // 是否显示复选框，默认不显示
 	type: Boolean,
 	default: false,
 },
+showRadio: {  //  是否显示单选框, 默认不显示
+	type: Boolean,
+	default: false,
+},
+leafOnly: {  //  checkbox 或 radio 是否只显示叶子节点
+	type: Boolean,
+	default: false, 
+},
+checked: {   // 多选时,初始化选中节点数组
+	type: Array,
+	default: [],
+},
+selected: {  // 单选时,初始化选中的节点
+	type: Object,
+},
+expand: {    // 初始化展开节点
+	type: Array,
+	default: [],
+},
+autoExpand: { // 展开tree使得传入的 checked 可见，此配置会让 expand 失效
+	type: Boolean,
+	default: false
+},
+changeHandler: {  // 选中状态发生变化时执行的函数, 多选时 checked 为选中的节点数组, 单选时 checked 为只包含一个选中节点的数组
+	type: Function,
+	default: (checked) => {},
+},
 hasChildren: {  // 判断是否有子节点，默认判断节点数据的[children]属性是否是True值。注意如果children为[]也会判断为有子节点。可通过传递自定义判断函数满足不同需求
 	type: Function,
 	default: data => data.children
@@ -41,28 +68,12 @@ getName: {   // 获取节点展示名称，默认为name
 	type: Function,
 	default: data => data.name
 },
-checked: {   // 初始化选中节点
-	type: Array,
-	default: [],
-},
-expand: {    // 初始化展开节点
-	type: Array,
-	default: [],
-},
-autoExpand: { // 展开tree使得传入的 checked 可见，此配置会让 expand 失效
-	type: Boolean,
-	default: false
-},
-changeHandler: {  // 选中状态发生变化时执行的函数
-	type: Function,
-	default: (checked) => {},
-},
 ```
 
 
 ## methods
 ```
-getChecked()  // 获取选中的节点
+getChecked()  // 返回选中的节点数组, 单选时返回只包含一个选中节点的数组
 ```
 
 ## example

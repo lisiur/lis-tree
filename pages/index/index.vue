@@ -1,6 +1,25 @@
 <template>
 	<view class="content">
-		<lis-tree class="tree" :root="root" :checked="checked" show-checkbox :change-handler="onChange" auto-expand></lis-tree>
+		<div style="height: 100vh">
+			<h1> 单选 </h1>
+			<lis-tree class="tree" :root="root" :selected="selected" show-radio :change-handler="onChange" auto-expand></lis-tree>
+		</div>
+
+		<div style="height: 100vh">
+			<h1> 单选, 只显示叶子节点 </h1>
+			<lis-tree class="tree" :root="root" :selected="selected" show-radio :change-handler="onChange" leaf-only auto-expand></lis-tree>
+		</div>
+		
+		<div style="height: 100vh">
+			<h1> 多选 </h1>
+			<lis-tree class="tree" :root="root" :checked="checked" show-checkbox :change-handler="onChange" auto-expand></lis-tree>
+		</div>
+		
+		<div style="height: 100vh">
+			<h1> 多选, 只显示叶子节点 </h1>
+			<lis-tree class="tree" :root="root" :checked="checked" show-checkbox :change-handler="onChange" leaf-only
+			 auto-expand></lis-tree>
+		</div>
 	</view>
 </template>
 
@@ -13,6 +32,7 @@
 		data() {
 			return {
 				root: {},
+				selected: null,
 				checked: [],
 			}
 		},
@@ -24,59 +44,51 @@
 		onLoad() {
 			setTimeout(() => {
 				this.root = {
-					children: [
-						{
+					children: [{
 							id: 'jiangsu',
 							name: '江苏省',
-							children: [
-								{
-									id: 'nanjing',
-									name: '南京市',
-									children: [
-										{
-											id: 'pukou',
-											name: '浦口区',
-										},
-										{
-											id: 'jiangning',
-											name: '江宁区',
-										}
-									]
-								},
-							]
+							children: [{
+								id: 'nanjing',
+								name: '南京市',
+								children: [{
+										id: 'pukou',
+										name: '浦口区',
+									},
+									{
+										id: 'jiangning',
+										name: '江宁区',
+									}
+								]
+							}, ]
 						},
 						{
 							id: 'zhejiang',
 							name: '浙江省',
-							children: [
-								{
-									id: 'hangzhou',
-									name: '杭州市',
-									children: [
-										{
-											id: 'yuhang',
-											name: '余杭区',
-										},
-									]
-								},
-							]
+							children: [{
+								id: 'hangzhou',
+								name: '杭州市',
+								children: [{
+									id: 'yuhang',
+									name: '余杭区',
+								}, ]
+							}, ]
 						},
 					]
 				}
-				this.checked = [
-					{
-						id: 'jiangning',
-					},
-					{
-						id: 'yuhang',
-					}
-				]
+				this.selected = {
+					id: 'jiangning',
+				}
+				this.checked = [{
+					id: 'jiangning'
+				}]
 			}, 1000)
 		},
-		
+
 	}
 </script>
 
 <style>
-	
+	h1 {
+		color: red;
+	}
 </style>

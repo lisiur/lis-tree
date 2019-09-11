@@ -3,10 +3,17 @@
 		<template v-for="(item, index) in getChildren(parent || root)">
 			<div class="uni-tree-item" :key="getId(item)">
 				<div class="uni-tree-item-self">
-					<div class="uni-tree-item-checkbox-wrapper" v-if="showCheckbox" @click="handleToggleCheck(currentLevelData[index])">
+					<div class="uni-tree-item-checkbox-wrapper" v-if="canShowCheckbox(item)" @click="handleToggleCheck(currentLevelData[index])">
 						<image class="uni-tree-item-checkbox-icon" :src="`/static/lis-tree/checked.png`" v-if="item._checked"></image>
 						<image class="uni-tree-item-checkbox-icon" :src="`/static/lis-tree/indeterminate.png`" v-else-if="item._indeterminate"></image>
 						<image class="uni-tree-item-checkbox-icon" :src="`/static/lis-tree/unchecked.png`" v-else></image>
+					</div>
+					<div 
+						v-if="canShowRadio(item)"
+						class="uni-tree-item-radio-wrapper"
+						@click="handleToggleSelect(currentLevelData[index])">
+						<image class="uni-tree-item-radio-icon" :src="`/static/lis-tree/selected.png`" v-if="item._selected"></image>
+						<image class="uni-tree-item-radio-icon" :src="`/static/lis-tree/unselected.png`" v-else></image>
 					</div>
 					<div class="uni-tree-item-name-wrapper" @click="handleToggleExpand(currentLevelData[index])">
 						<span class="uni-tree-item-name">{{item.name}}</span>
@@ -15,7 +22,7 @@
 				</div>
 				<div class="uni-tree-item-children" v-if="hasChildren(item)">
 					<lis-tree :root="root" :parent="item" :level="level+1" :has-children="hasChildren" :get-children="getChildren"
-					 :get-id="getId" :get-name="getName" :show-checkbox="showCheckbox" @on-change="onChange" v-if="item._expand"></lis-tree>
+					 :get-id="getId" :get-name="getName" :show-radio="showRadio" :leaf-only="leafOnly" :show-checkbox="showCheckbox" @on-change="onChange" v-if="item._expand"></lis-tree>
 				</div>
 			</div>
 		</template>
@@ -36,6 +43,14 @@
 				type: Boolean,
 				default: false,
 			},
+			showRadio: {
+				type: Boolean,
+				default: false,
+			},
+			leafOnly: {
+				type: Boolean,
+				default: false,
+			},
 			hasChildren: {
 				type: Function,
 				default: () => data => data.children
@@ -51,6 +66,9 @@
 			getName: {
 				type: Function,
 				default: () => data => data.name
+			},
+			selected: {
+				type: Object,
 			},
 			checked: {
 				type: Array,
@@ -75,7 +93,6 @@
 				type: Function,
 				default: () => {},
 			},
-
 		},
 		data() {
 			return {
@@ -107,13 +124,16 @@
 				this.init({checked: true, expand: true})
 			},
 			expand() {
-				this.init({checked: true, expand: true})
-			}
+				this.init({expand: true})
+			},
+			selected() {
+				this.init({selected: true, expand: true})
+			},
 		},
 		methods: {
-			init({expand, checked}) {
+			init({expand, checked, selected}) {
 				if (this.level === 0) {
-					this.syncState({checked, expand})
+					this.syncState({checked, expand, selected})
 				}
 				this.setCurrentLevelData()
 			},
@@ -134,9 +154,12 @@
 					this.$emit('on-change', item, handler)
 				}
 			},
-			syncState({expand, checked}) {
+			syncState({expand, checked, selected}) {
 				if (checked) {
 					this.syncStateChecked()
+				}
+				if (selected) {
+					this.syncStateSelected()
 				}
 				if (expand) {
 					this.syncStateExpand()
@@ -155,6 +178,23 @@
 					if (item._checked) {
 						this.upStreamCheck(item)
 						this.downStreamCheck(item)
+						return true
+					}
+				})
+				return parent
+			},
+			syncStateSelected() {
+				const parent = this.root
+				this.forEachTree(parent, (item, parent) => {
+					this.$set(item, '_selected', this.isSelected(item))
+					this.$set(item, '_expand', false)
+					this.$set(item, '_indeterminate', false)
+					this.$set(item, '_parent', this.getId(parent))
+					this.$set(item, '_hasChildren', this.hasChildren(item))
+				})
+				this.forEachTree(parent, (item, parent) => {
+					if (item._selected) {
+						this.upStreamSelect(item)
 						return true
 					}
 				})
@@ -194,6 +234,22 @@
 					}
 				}
 			},
+			clearSelect() {
+				this.forEachTree(this.root, (item) => {
+					this.$set(item, '_indeterminate', false)
+					this.$set(item, '_selected', false)
+				})
+			},
+			upStreamSelect(node) {
+				if (node) {
+					const parent = this.getItemById(node._parent)
+					if (!parent) {
+						return
+					}
+					this.$set(parent, '_indeterminate', true)
+					this.upStreamCheck(parent)
+				}
+			},
 			upStreamCheck(node) {
 				if (node) {
 					const parent = this.getItemById(node._parent)
@@ -220,6 +276,9 @@
 			isChecked(item) {
 				return !!this.checked.find(it => this.isSame(item, it))
 			},
+			isSelected(item) {
+				return this.isSame(item, this.selected)
+			},
 			isExpand(item) {
 				return !!this.innerExpand.find(it => this.isSame(item, it))
 			},
@@ -232,6 +291,22 @@
 			},
 			isSame(itemA, itemB) {
 				return this.getId(itemA) === this.getId(itemB)
+			},
+			canShowCheckbox(item) {
+				if (this.showCheckbox) {
+					if (this.leafOnly) {
+						return !this.hasChildren(item)
+					}
+					return true
+				}
+			},
+			canShowRadio(item) {
+				if (this.showRadio) {
+					if (this.leafOnly) {
+						return !this.hasChildren(item)
+					}
+					return true
+				}
 			},
 			getItemById(id) {
 				let target = null
@@ -264,13 +339,33 @@
 					})
 				})
 			},
+			handleToggleSelect(item) {
+				const self = this
+				this.$emit('on-change', item, function(item) {
+					this.clearSelect()
+					this.$set(item, '_selected', true)
+					this.upStreamSelect(item)
+					this.$nextTick(() => {
+						this.setCurrentLevelData.call(self)
+					})
+				})
+			},
 			getChecked() {
 				const checked = []
-				this.forEachTree(this.root, function(item) {
-					if (item._checked) {
-						checked.push(item)
-						return true
+				this.forEachTree(this.root, item => {
+					if (this.showCheckbox) {
+						if (item._checked) {
+							checked.push(item)
+							return true
+						}
 					}
+					if (this.showRadio) {
+						if (item._selected) {
+							checked.push(item)
+							return true
+						}
+					}
+					
 				})
 				return checked
 			}
@@ -289,8 +384,18 @@
 		width: 52upx;
 		height: 52upx;
 	}
+	
+	.uni-tree-item-radio-icon {
+		width: 52upx;
+		height: 52upx;
+	}
 
 	.uni-tree-item-checkbox-wrapper {
+		display: flex;
+		align-items: center;
+	}
+	
+	.uni-tree-item-radio-wrapper {
 		display: flex;
 		align-items: center;
 	}
@@ -299,6 +404,7 @@
 		flex: 1;
 		display: flex;
 		align-items: center;
+		margin-left: 8upx;
 	}
 
 	.uni-tree-item-expand-icon {
