@@ -66,6 +66,10 @@
 				type: Function,
 				default: () => data => data.name
 			},
+			changeHandler: {
+				type: Function,
+				default: () => () => {},
+			},
 			// #endif
 			// #ifdef H5
 			hasChildren: {
@@ -83,6 +87,10 @@
 			getName: {
 				type: Function,
 				default: data => data.name
+			},
+			changeHandler: {
+				type: Function,
+				default: () => {},
 			},
 			// #endif
 			selected: {
@@ -106,10 +114,6 @@
 			},
 			getRoot: {
 				type: Function,
-			},
-			changeHandler: {
-				type: Function,
-				default: () => {},
 			},
 		},
 		data() {
