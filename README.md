@@ -171,3 +171,7 @@ getChecked()  // 返回选中的节点数组, 单选时返回只包含一个选�
 </script>
 ```
 
+## 写在最后
+有问题可以加我 QQ 联系: 1127441517
+
+没开赞赏, 要是觉得该组件对您有帮助的话, 麻烦给我的 [github](https://github.com/lisiur/lis-tree) 点个 star 哦~~
