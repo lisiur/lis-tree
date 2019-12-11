@@ -63,6 +63,10 @@ changeHandler: {  // 选中状态发生变化时执行的函数, 多选时 check
 	type: Function,
 	default: (checked) => {},
 },
+clickHandler: {  // 点击节点时，执行的函数
+	type: Function,
+	default: (item) => {},
+},
 hasChildren: {  // 判断是否有子节点，默认判断节点数据的[children]属性是否是True值。注意如果children为[]也会判断为有子节点。可通过传递自定义判断函数满足不同需求
 	type: Function,
 	default: data => data.children

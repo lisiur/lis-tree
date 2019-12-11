@@ -13,7 +13,7 @@
 
 		<div style="height: 100vh">
 			<h1> 多选 </h1>
-			<lis-tree ref="tree" class="tree" :root="root" :checked="checked" show-checkbox :change-handler="onChange"
+			<lis-tree ref="tree" class="tree" :root="root" :checked="checked" show-checkbox :change-handler="onChange" :click-handler="onClick"
 			 auto-expand></lis-tree>
 			<button @click="getChecked">确定</button>
 			<button @click="toggleExpand">展开/收起</button>
@@ -44,6 +44,9 @@
 		methods: {
 			onChange(selected) {
 				console.log(selected)
+			},
+			onClick(item) {
+				console.log(item)
 			},
 			getChecked() {
 				const checked = this.$refs.tree.getChecked()
