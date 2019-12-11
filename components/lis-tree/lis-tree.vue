@@ -445,6 +445,12 @@
 					this.$set(item, '_expand', expand)
 				})
 			},
+			toggleAllChecked(checked) {
+				this.forEachTree(this.root, (item, parent) => {
+					this.$set(item, '_checked', checked)
+					this.$set(item, '_indeterminate', false)
+				})
+			},
 			getChecked(all = false) {
 				const checked = []
 				if (this.showCheckbox) {
