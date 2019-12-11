@@ -20,7 +20,7 @@
 				<div class="uni-tree-item-children" v-if="hasChildren(item)">
 					<lis-tree :root="root" :parent="item" :level="level+1" :has-children="hasChildren" :get-children="getChildren"
 					 :get-id="getId" :get-name="getName" :show-radio="showRadio" :leaf-only="leafOnly" :show-checkbox="showCheckbox"
-					 @on-change="onChange" v-if="item._expand"></lis-tree>
+					 @on-change="onChange" @on-toggle-expand="onToggleExpand" v-if="item._expand"></lis-tree>
 				</div>
 			</div>
 		</template>
@@ -70,6 +70,10 @@
 				type: Function,
 				default: () => () => {},
 			},
+			clickHandler: {
+				type: Function,
+				default: () => () => {},
+			},
 			// #endif
 			// #ifdef H5
 			hasChildren: {
@@ -89,6 +93,10 @@
 				default: data => data.name
 			},
 			changeHandler: {
+				type: Function,
+				default: () => {},
+			},
+			clickHandler: {
 				type: Function,
 				default: () => {},
 			},
@@ -134,11 +142,22 @@
 						this.changeHandler(this.getChecked())
 					})
 				})
+				this.$on('on-toggle-expand', ({
+					item,
+					handler
+				}) => {
+					handler.call(this, item)
+					this.$nextTick(() => {
+						this.setCurrentLevelData()
+						this.clickHandler(item)
+					})
+				})
 			}
 		},
 		onUnload() {
 			if (this.level === 0) {
 				this.$off('on-change')
+				this.$off('on-toggle-expand')
 			}
 		},
 		watch: {
@@ -220,6 +239,34 @@
 					this.changeHandler(this.getChecked())
 				} else {
 					this.$emit('on-change', {
+						item,
+						handler
+					})
+				}
+			},
+			onToggleExpand(args) {
+				// #ifdef H5
+				const {
+					item,
+					handler
+				} = args
+				// #endif
+				
+				// #ifndef H5
+				const {
+					item,
+					handler
+				} = args.detail.__args__[0]
+				// #endif
+				
+				if (this.level === 0) {
+					const id = this.getId(item)
+					const target = this.getItemById(id)
+				
+					handler.call(this, target)
+					this.clickHandler(target)
+				} else {
+					this.$emit('on-toggle-expand', {
 						item,
 						handler
 					})
@@ -401,7 +448,7 @@
 			},
 			handleToggleExpand(item) {
 				const self = this
-				this.$emit('on-change', {
+				this.$emit('on-toggle-expand', {
 					item,
 					handler: function(item) {
 						this.$set(item, '_expand', !item._expand)
