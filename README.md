@@ -85,6 +85,8 @@ getName: {   // 获取节点展示名称，默认为name
 ## methods
 ```
 getChecked()  // 返回选中的节点数组, 单选时返回只包含一个选中节点的数组
+getAllChecked()  // 返回所有选中的节点数组
+toggleAllExpand(flag)  // 设置 tree 是否完全展开/收起
 ```
 
 ## example
