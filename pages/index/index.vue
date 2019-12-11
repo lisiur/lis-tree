@@ -3,18 +3,22 @@
 		<div style="height: 100vh">
 			<h1> 单选 </h1>
 			<lis-tree class="tree" :root="root" :selected="selected" show-radio :change-handler="onChange" auto-expand></lis-tree>
+
 		</div>
 
 		<div style="height: 100vh">
 			<h1> 单选, 只显示叶子节点 </h1>
 			<lis-tree class="tree" :root="root" :selected="selected" show-radio :change-handler="onChange" leaf-only auto-expand></lis-tree>
 		</div>
-		
+
 		<div style="height: 100vh">
 			<h1> 多选 </h1>
-			<lis-tree class="tree" :root="root" :checked="checked" show-checkbox :change-handler="onChange" auto-expand></lis-tree>
+			<lis-tree ref="tree" class="tree" :root="root" :checked="checked" show-checkbox :change-handler="onChange"
+			 auto-expand></lis-tree>
+			<button @click="getChecked">确定</button>
+			<button @click="toggleExpand">展开/收起</button>
 		</div>
-		
+
 		<div style="height: 100vh">
 			<h1> 多选, 只显示叶子节点 </h1>
 			<lis-tree class="tree" :root="root" :checked="checked" show-checkbox :change-handler="onChange" leaf-only
@@ -34,17 +38,28 @@
 				root: {},
 				selected: null,
 				checked: [],
+				allExpand: false,
 			}
 		},
 		methods: {
 			onChange(selected) {
 				console.log(selected)
-			}
+			},
+			getChecked() {
+				const checked = this.$refs.tree.getChecked()
+				const allChecked = this.$refs.tree.getAllChecked()
+				console.log(checked, allChecked)
+			},
+			toggleExpand() {
+				this.allExpand = !this.allExpand
+				this.$refs.tree.toggleAllExpand(this.allExpand)
+			},
 		},
 		onLoad() {
 			setTimeout(() => {
 				this.root = {
-					children: [{
+					children: [
+						{
 							id: 'jiangsu',
 							name: '江苏省',
 							children: [{

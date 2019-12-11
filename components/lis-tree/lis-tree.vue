@@ -440,7 +440,12 @@
 					}
 				})
 			},
-			getChecked() {
+			toggleAllExpand(expand) {
+				this.forEachTree(this.root, (item, parent) => {
+					this.$set(item, '_expand', expand)
+				})
+			},
+			getChecked(all = false) {
 				const checked = []
 				if (this.showCheckbox) {
 					this.forEachTree(this.root, item => {
@@ -451,7 +456,7 @@
 						} else {
 							if (item._checked) {
 								checked.push(item)
-								return true
+								return !all
 							}
 						}
 					})
@@ -460,12 +465,15 @@
 					this.forEachTree(this.root, item => {
 						if (item._selected) {
 							checked.push(item)
-							return true
+							return !all
 						}
 					})
 				}
 				return checked
-			}
+			},
+			getAllChecked() {
+				return this.getChecked(true)
+			},
 		}
 	}
 </script>
